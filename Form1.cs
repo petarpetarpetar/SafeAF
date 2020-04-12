@@ -19,7 +19,7 @@ namespace PasswordManager
     {
         #region variables
 
-        TcpClient sock = new TcpClient();
+        public TcpClient sock = new TcpClient();
 
         static RSACryptoServiceProvider csp = new RSACryptoServiceProvider(2048);
 
@@ -43,14 +43,11 @@ namespace PasswordManager
             InitializeComponent();
         }
 
-        
-
         private void Form1_Load(object sender, EventArgs e)
         {
             inpPw.BorderStyle = BorderStyle.None;
             inpMail.BorderStyle = BorderStyle.None;
         }
-
 
         #region mouseEvents
         private void Form1_MouseDown(object sender, MouseEventArgs e)
@@ -76,7 +73,7 @@ namespace PasswordManager
         }
 
         private void label1_Click(object sender, EventArgs e)
-        {
+        { 
             //this is exit button
             Cursor.Current = Cursors.WaitCursor;
             this.Close();
@@ -96,10 +93,11 @@ namespace PasswordManager
         #endregion
 
         #region RSAstuff
-        public string EncryptData(string data, RSAParameters key)
+        public string EncryptData(string data, RSAParameters key, bool reset = true)
         {
             var bytesPlainData = System.Text.Encoding.Unicode.GetBytes(data);
-            csp.ImportParameters(key);
+            if(reset)
+                csp.ImportParameters(key);
             var bytesCypherText = csp.Encrypt(bytesPlainData, false);
             var cypherText = Convert.ToBase64String(bytesCypherText);
 
@@ -191,7 +189,7 @@ namespace PasswordManager
                 byte[] sendBuff = asen.GetBytes(_data);
                 stm.Write(sendBuff, 0, sendBuff.Length);
             }
-            catch (Exception) { return false; }
+            catch (Exception e) { MessageBox.Show("ERROR OCCURED IN WRITESERVER\n"+e.ToString()); }
             
             return true;
         }

@@ -21,20 +21,16 @@ namespace PasswordManager
         public registerForm(Form1 _parent)
         {
             parentForm = _parent;
-            parentForm.connectToServer(Dns.GetHostName(),1234);
+            parentForm.connectToServer(Dns.GetHostName(), 1234);
             parentForm.writeToServer("r100");
-            
+
             InitializeComponent();
         }
 
+        #region looks
         private void registerForm_Load(object sender, EventArgs e)
         {
             this.FormBorderStyle = FormBorderStyle.None;
-        }
-
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void registerForm_Paint(object sender, PaintEventArgs e)
@@ -49,8 +45,9 @@ namespace PasswordManager
 
             l.Dispose();
             this.Update();
-
         }
+#endregion
+
         #region mouseEvents
         private bool mouseDown;
 
@@ -77,11 +74,9 @@ namespace PasswordManager
         {
             mouseDown = false;
         }
+        #endregion
 
-        private void regBtn_Click(object sender, EventArgs e)
-        {
-            label1.Text = "asd";
-        }
+
         private bool IsValidEmail(string email)
         {
             try
@@ -94,12 +89,67 @@ namespace PasswordManager
                 return false;
             }
         }
+
+        private void regBtn_Click(object sender, EventArgs e)
+        {
+            bool checkPasswords(string pw1, string pw2)
+            {
+                if(pw1 != pw2)
+                {
+                    lblStatus.Text = "Password do not match";
+                    lblStatus.ForeColor = Color.Red;
+                    return false;
+                }
+                if (pw2.Length < 8)
+                {
+                    lblStatus.Text = "Password is too short. Must be at least 8 characters long.";
+                    lblStatus.ForeColor = Color.Red;
+                    return false;
+                }
+                return true;
+            }
+
+            if(IsValidEmail(inpMail.Text) && checkPasswords(inpPw.Text, inpPw2.Text) && inpCode.Text.Length == 4)
+            {
+                lblStatus.ForeColor = Color.Yellow;
+                parentForm.writeToServer("r120");
+                var encData = parentForm.EncryptData(inpMail.Text+"$"+inpCode.Text+"$"+inpPw.Text, parentForm.serverPubKey);
+                parentForm.writeToServer(encData);
+
+                lblStatus.Text = "Sent, waiting for server response.";
+                lblStatus.ForeColor = Color.Green;
+                
+            }
+            else
+            {
+                lblStatus.Text = "Check your form and try again.";
+                lblStatus.ForeColor = Color.Red;
+                return;
+            }
+
+            string response = parentForm.readFromServer();
+
+            if(response == "r200")
+            {
+                lblStatus.Text = "Okay, now close this form and login.";
+                lblStatus.ForeColor = Color.Green;
+            }
+            else if(response =="r300")
+            {
+                lblStatus.Text = "Your code is probably wrong, check it again.";
+                lblStatus.ForeColor = Color.Red;
+            }
+            return;
+        }
+
+
         private void codeBtn_Click(object sender, EventArgs e)
         {
-            if (inpMail.Text == "")
+            if (!IsValidEmail(inpMail.Text))
             {
                 lblStatus.Text = "Please provide valid email";
                 lblStatus.ForeColor = Color.Red;
+                return;
             }
             lblStatus.Text = "Check email for code";
             lblStatus.ForeColor = Color.Blue;
@@ -109,17 +159,19 @@ namespace PasswordManager
           
             String serverPUBKEYSTR = parentForm.readFromServer();
             MessageBox.Show(serverPUBKEYSTR);
+
             var sr = new System.IO.StringReader(serverPUBKEYSTR);
             var xs = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
             parentForm.serverPubKey = (RSAParameters)xs.Deserialize(sr);
 
-            var cypherText = parentForm.EncryptData(inpMail.Text + "$" + inpPw.Text, parentForm.serverPubKey);
+            var cypherText = parentForm.EncryptData(inpMail.Text, parentForm.serverPubKey);
             parentForm.writeToServer(cypherText);
         }
-        #endregion
 
         private void btnExit_Click(object sender, EventArgs e)
         {
+            parentForm.writeToServer("e100");
+            parentForm.sock.Close();
             this.Close();
         }
     }
