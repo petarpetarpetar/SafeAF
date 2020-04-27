@@ -172,6 +172,10 @@ namespace PasswordManager
         {
             parentForm.writeToServer("e100");
             parentForm.sock.Close();
+            parentForm.Opacity = 100;
+            parentForm.ShowInTaskbar = true;
+            parentForm.Activate();
+            parentForm.BringToFront();
             this.Close();
         }
     }

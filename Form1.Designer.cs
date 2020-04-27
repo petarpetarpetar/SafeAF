@@ -117,6 +117,7 @@
             this.inpPw.PasswordChar = '*';
             this.inpPw.Size = new System.Drawing.Size(202, 27);
             this.inpPw.TabIndex = 3;
+            this.inpPw.Text = "safeafpassword1";
             this.inpPw.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
             this.inpPw.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseMove);
             this.inpPw.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseUp);
@@ -169,6 +170,7 @@
             this.inpMail.Name = "inpMail";
             this.inpMail.Size = new System.Drawing.Size(202, 27);
             this.inpMail.TabIndex = 2;
+            this.inpMail.Text = "example@safeaf.com";
             this.inpMail.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
             this.inpMail.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseMove);
             this.inpMail.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseUp);

@@ -33,6 +33,9 @@ namespace PasswordManager
         
         private bool mouseDown;
 
+        public string usrMail;
+        public string usrPassword;
+
         private Point lastLocation;
         #endregion
 
@@ -82,7 +85,8 @@ namespace PasswordManager
         private void registerBtn_Click(object sender, EventArgs e)
         {
             registerForm regform = new registerForm(this);
-            
+            this.Opacity = 0;
+            this.ShowInTaskbar = false;
             regform.ShowDialog();
 
         }
@@ -238,8 +242,15 @@ namespace PasswordManager
                 //now waiting for response. Am I logged in?
                 String loginStatus = readFromServer();
 
-                writeToServer("e100");
-                sock.Close();
+                if(String.Equals(loginStatus,"c105"))
+                {
+                    this.usrMail = this.inpMail.Text;
+                    this.usrPassword = this.inpPw.Text;
+                    this.Opacity = 0;
+                    this.ShowInTaskbar = false;
+                    appForm aForm = new appForm(this);
+                    aForm.Show();
+                }
             }
             catch(Exception e){MessageBox.Show(e.ToString());}
 
