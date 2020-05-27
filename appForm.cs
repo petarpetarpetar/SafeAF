@@ -12,14 +12,71 @@ namespace PasswordManager
 {
     public partial class appForm : Form
     {
-        Form1 parent;
+        public Form1 parent;
+        public static List<PasswordForSite> allPasswords = new List<PasswordForSite>();
         public appForm(Form1 parentForm)
         {
             parent = parentForm;
             InitializeComponent();
             this.loggedInHolder.Text = "Logged in as: " + parent.usrMail;
-            this.FormBorderStyle = FormBorderStyle.None;   
+            this.FormBorderStyle = FormBorderStyle.None;
+            parent.writeToServer("g100");
+            bool login = parent.checkLogin(parent.usrMail, parent.usrPassword, false);
+            if(login)
+            {
+                MessageBox.Show("Test");
+                return;
+            }
+            string res = parent.readFromServer();
+            string temp;
+
+            PasswordForSite tempPFS = new PasswordForSite();
+            while (true)
+            {
+                tempPFS = new PasswordForSite();
+                temp = parent.readFromServer();
+                if (temp == "g300")
+                    break;
+                tempPFS.Site = temp;
+                parent.writeToServer("ok");
+                tempPFS.Mail = parent.readFromServer();
+                parent.writeToServer("ok");
+                tempPFS.Password = parent.readFromServer();
+                parent.writeToServer("OK");
+                allPasswords.Add(tempPFS);
+            }
+
         }
+
+
+        #region mouseEvents
+        private bool mouseDown;
+
+        private Point lastLocation;
+        private void WINDOW_MouseDown(object sender, MouseEventArgs e)
+        {
+            mouseDown = true;
+            lastLocation = e.Location;
+        }
+
+        private void WINDOW_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (mouseDown)
+            {
+                this.Location = new Point(
+                    (this.Location.X - lastLocation.X) + e.X, (this.Location.Y - lastLocation.Y) + e.Y);
+
+                this.Update();
+            }
+        }
+
+        private void WINDOW_MouseUp(object sender, MouseEventArgs e)
+        {
+            mouseDown = false;
+        }
+
+        #endregion
+
 
         private void exitBtn_Click(object sender, EventArgs e)
         {
@@ -41,6 +98,14 @@ namespace PasswordManager
             resetBtnColors();
             showPwsBtn.BackColor = Color.FromArgb(60, 60, 60);
             keyPicBox.BackColor = Color.FromArgb(60, 60, 60);
+
+            myPasswords active = new myPasswords(this,allPasswords);
+
+            active.TopLevel = false;
+            active.AutoScroll = true;
+            workingPanel.Controls.Clear();
+            workingPanel.Controls.Add(active);
+            active.Show();
         }
 
         private void newPwBtn_Click(object sender, EventArgs e)
@@ -48,6 +113,14 @@ namespace PasswordManager
             resetBtnColors();
             newPwBtn.BackColor = Color.FromArgb(60, 60, 60);
             plusPicBox.BackColor = Color.FromArgb(60, 60, 60);
+
+            AddNewPW active = new AddNewPW(this, allPasswords);
+
+            active.TopLevel = false;
+            active.AutoScroll = true;
+            workingPanel.Controls.Clear();
+            workingPanel.Controls.Add(active);
+            active.Show();
         }
 
         private void pwGeneratorBtn_Click(object sender, EventArgs e)
@@ -62,6 +135,14 @@ namespace PasswordManager
             resetBtnColors();
             logsBtn.BackColor = Color.FromArgb(60, 60, 60);
             logPicBox.BackColor = Color.FromArgb(60, 60, 60);
+
+            myLogs active = new myLogs(this);
+
+            active.TopLevel = false;
+            active.AutoScroll = true;
+            workingPanel.Controls.Clear();
+            workingPanel.Controls.Add(active);
+            active.Show();
         }
 
         private void accountBtn_Click(object sender, EventArgs e)
@@ -94,5 +175,14 @@ namespace PasswordManager
             keyPicBox.BackColor = Color.FromArgb(20, 20, 20);
         }
 
+        private void workingPanel_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void appForm_Load(object sender, EventArgs e)
+        {
+            this.Icon = Properties.Resources.SAF_circle;
+        }
     }
 }

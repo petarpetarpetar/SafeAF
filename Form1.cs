@@ -92,7 +92,7 @@ namespace PasswordManager
         }
         private void loginBtn_Click_1(object sender, EventArgs e)
         {
-            checkLogin(inpMail.Text, inpPw.Text);
+            checkLogin(inpMail.Text, inpPw.Text, true);
         }
         #endregion
 
@@ -218,14 +218,15 @@ namespace PasswordManager
         }
         #endregion
 
-        private void checkLogin(string name, string password)
+        public bool checkLogin(string name, string password, bool first)
         {
             try
             {
                 connectToServer(Dns.GetHostName(), 1234);
 
                 //sending login request to the server: ("c100" is a code for login request comand)
-                writeToServer("c100");
+                if(first)
+                    writeToServer("c100");
 
                 //recieving server's public key as string:
                 String serverPubKeyString = readFromServer();
@@ -236,7 +237,7 @@ namespace PasswordManager
                 serverPubKey = (RSAParameters)xs.Deserialize(sr);
 
                 //sending ecrypted mail and password:
-                var cypherText = EncryptData(inpMail.Text + "$" + inpPw.Text, serverPubKey);
+                var cypherText = EncryptData(name + "$" + password, serverPubKey);
                 writeToServer(cypherText);
 
                 //now waiting for response. Am I logged in?
@@ -250,10 +251,11 @@ namespace PasswordManager
                     this.ShowInTaskbar = false;
                     appForm aForm = new appForm(this);
                     aForm.Show();
+                    return true;
                 }
             }
             catch(Exception e){MessageBox.Show(e.ToString());}
-
+            return false;
         }
 
         private void tableLayoutPanel2_Paint(object sender, PaintEventArgs e)

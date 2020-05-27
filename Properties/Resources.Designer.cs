@@ -79,5 +79,25 @@ namespace PasswordManager.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon SAF_circle {
+            get {
+                object obj = ResourceManager.GetObject("SAF_circle", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon SAF_rect {
+            get {
+                object obj = ResourceManager.GetObject("SAF_rect", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
     }
 }
